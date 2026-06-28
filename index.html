@@ -44,6 +44,8 @@
   .cover .t{font-size:19px; font-weight:800; line-height:1.15; margin-top:10px; text-shadow:0 1px 3px rgba(0,0,0,.25);}
   .cover .badge{position:absolute; top:10px; right:10px; background:rgba(255,255,255,.92); color:var(--ink);
     font-size:12px; font-weight:800; padding:4px 9px; border-radius:999px;}
+  .cover .lvl{position:absolute; top:10px; left:10px; background:rgba(0,0,0,.28); color:#fff;
+    font-size:11px; font-weight:800; padding:3px 8px; border-radius:999px; letter-spacing:.02em;}
 
   /* big menu buttons */
   .bigrow{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
@@ -132,6 +134,77 @@
    ============================================================ */
 
 const BOOKS = [
+/* ---- Reception (Phase 2–4) only: no split digraphs, no Phase 5 graphemes ---- */
+{
+  id:"kickit", title:"Kick It!", emoji:"⚽", level:"reception", grad:"linear-gradient(160deg,#1d8a4e,#0d3d22)",
+  newWords:["team","match","ball"],
+  pages:[
+    {art:"⚽", text:"Bobby has a red top. He is in the red team."},
+    {art:"🏟️", text:"It is the big match. The reds run at the blues."},
+    {art:"😮", text:"A blue man kicks the ball hard. It is a goal for the blues! Oh no!"},
+    {art:"💨", text:"Bobby will not stop. He runs and runs."},
+    {art:"🎯", text:"Jack gets the ball. He kicks it to Bobby."},
+    {art:"🥅", text:"Bobby kicks it hard. It is in the net! GOAL!"},
+    {art:"🏆", text:"The reds win! Bobby lifts the cup up high."},
+    {art:"⭐", text:"Mum and Dad are so glad. Bobby is a star!"}
+  ]
+},
+{
+  id:"moontrip", title:"Trip to the Moon", emoji:"🚀", level:"reception", grad:"linear-gradient(160deg,#3a4f8f,#10173a)",
+  newWords:["space","suit"],
+  pages:[
+    {art:"🌙", text:"Look up at night. Can you see the moon?"},
+    {art:"🚀", text:"The moon is far up high. A rocket can get up to it."},
+    {art:"🔥", text:"The rocket lifts up. It is so fast!"},
+    {art:"👩‍🚀", text:"Up in space there is no air. You must put on a big suit."},
+    {art:"🌕", text:"On the moon you can jump up high. Boing!"},
+    {art:"✨", text:"Look at the stars at night. Each star is far, far up."},
+    {art:"🪐", text:"Some stars have a planet next to them."},
+    {art:"🔭", text:"When you are big, you can go to space too! Look up."}
+  ]
+},
+{
+  id:"rsharks", title:"Sharks", emoji:"🦈", level:"reception", grad:"linear-gradient(160deg,#2a7a96,#0d3d52)",
+  newWords:["sea"],
+  pages:[
+    {art:"🦈", text:"A shark swims down deep in the sea."},
+    {art:"🦷", text:"A shark has lots of sharp teeth!"},
+    {art:"🦈", text:"If a tooth gets lost, a tooth pops back up."},
+    {art:"🐋", text:"The big shark is as long as a bus. It eats little fish."},
+    {art:"👃", text:"A shark can smell from far off."},
+    {art:"🌊", text:"A shark can hunt in the dark."},
+    {art:"🦴", text:"Sharks were here for so long, long back."},
+    {art:"😅", text:"A shark looks bad. But it will not get you!"}
+  ]
+},
+{
+  id:"rtrucks", title:"Big Trucks", emoji:"🚜", level:"reception", grad:"linear-gradient(160deg,#c98a14,#7a4f05)",
+  newWords:["crane"],
+  pages:[
+    {art:"🚧", text:"Beep, beep! The big trucks are here. Get to work!"},
+    {art:"🚜", text:"The digger digs up mud with its big arm."},
+    {art:"🪨", text:"The dump truck tips out rocks. Crash!"},
+    {art:"🏗️", text:"The crane lifts up high. Up, up, up!"},
+    {art:"🌀", text:"The mixer spins and spins."},
+    {art:"🛣️", text:"The roller presses the road flat."},
+    {art:"🧱", text:"Bit by bit, the trucks get the job done."},
+    {art:"🌅", text:"The job is done. The trucks rest. See you soon!"}
+  ]
+},
+{
+  id:"hero", title:"Super Bobby", emoji:"🦸", level:"reception", grad:"linear-gradient(160deg,#c5283d,#5e0f1a)",
+  newWords:["hero"],
+  pages:[
+    {art:"🦸", text:"Bobby puts on his mask. He is a hero!"},
+    {art:"💪", text:"Bobby is so strong. He can lift a big rock!"},
+    {art:"🏃", text:"Bobby is so fast. He can run up a hill in a flash!"},
+    {art:"🆘", text:"Help! A cat is stuck up in a tree!"},
+    {art:"🐈", text:"Bobby zooms up. He gets the cat. Down they go."},
+    {art:"🚌", text:"A bus is stuck in the mud. Bobby gets it out with a push!"},
+    {art:"🦹", text:"Oh no! A bad man! He runs off with the cash."},
+    {art:"🎉", text:"Bobby gets him! Bobby wins. What a hero!"}
+  ]
+},
 {
   id:"match", title:"The Big Match", emoji:"⚽", grad:"linear-gradient(160deg,#2244bb,#10246e)",
   newWords:["does","give"],
@@ -461,6 +534,7 @@ function showHome(){
   BOOKS.forEach(bk=>{
     const c=el(`<button class="cover" style="background:${bk.grad}">
       ${readBooks.includes(bk.id)?'<span class="badge">★ Read it!</span>':''}
+      ${bk.level==="reception"?'<span class="lvl">Easy start</span>':''}
       <span class="emoji">${bk.emoji}</span><span class="t">${bk.title}</span></button>`);
     c.onclick=()=>showBook(bk,-1);
     shelf.append(c);
