@@ -1,0 +1,11 @@
+{
+  "name": "bobby-big-adventure",
+  "version": "2.0.0",
+  "private": true,
+  "description": "A static reading and maths adventure for Bobby",
+  "scripts": {
+    "test": "node --test tests/engine.test.cjs && node tests/integration.cjs",
+    "start": "python3 -m http.server 8137 --bind 127.0.0.1"
+  },
+  "devDependencies": {"jsdom": "29.1.1"}
+}
