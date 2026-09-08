@@ -1,12 +1,18 @@
 /* Pure question generation and progression; shared with the test runner. */
 (function(root){
 const levels=['Warm up','Explorer','Challenger','Cosmic'];
-const modes={doubles:{name:'Double trouble',symbol:'×2',description:'48 + 48? Let’s find out.',colour:'orange'},add:{name:'Rocket sums',symbol:'+',description:'Ten fresh sums. Then play some more.',colour:'mint'},subtract:{name:'Little takeaways',symbol:'−',description:'Small numbers. Tap to take away.',colour:'purple'},missing:{name:'Secret numbers',symbol:'?',description:'Crack the missing number.',colour:'yellow'},patterns:{name:'Pattern planet',symbol:'…',description:'Find the rule. Keep it going.',colour:'purple'},groups:{name:'Times tables',symbol:'×',description:'Pick a table and practise multiplying.',colour:'mint'}};
+const modes={bonds:{name:'Number bonds',symbol:'100',description:'Find the missing fuel to make 10, 20 or 100.',colour:'yellow'},money:{name:'Pocket money',symbol:'p',description:'Add the prices in Pip’s space shop.',colour:'orange'},doubles:{name:'Double trouble',symbol:'×2',description:'48 + 48? Let’s find out.',colour:'orange'},add:{name:'Rocket sums',symbol:'+',description:'Ten fresh sums. Then play some more.',colour:'mint'},subtract:{name:'Little takeaways',symbol:'−',description:'Small numbers. Tap to take away.',colour:'purple'},missing:{name:'Secret numbers',symbol:'?',description:'Crack the missing number.',colour:'yellow'},patterns:{name:'Pattern planet',symbol:'…',description:'Find the rule. Keep it going.',colour:'purple'},groups:{name:'Times tables',symbol:'×',description:'Pick a table and practise multiplying.',colour:'mint'}};
 function integer(a,b,rng){return a+Math.floor(rng()*(b-a+1));}
 function question(mode,tier=1,rng=Math.random,index=0){
  tier=Math.max(0,Math.min(3,tier)); const rand=(a,b)=>integer(a,b,rng); let a,b,answer,prompt,hint,explain,visual,spoken;
  const max=[10,50,100,500][tier];
- if(mode==='doubles'){
+ if(mode==='bonds'){
+ const target=[10,20,100,100][tier];a=rand(1,target-1);b=target-a;answer=b;prompt=`${a} + ? = ${target}`;
+ hint=`Start at ${a}. Count up to ${target}.`;explain=`${a} + ${b} = ${target}. The two parts make a whole.`;visual={kind:'parts',a,b:null};
+ }else if(mode==='money'){
+ a=rand(1,[9,30,50,99][tier]);b=rand(1,[9,30,50,99][tier]);answer=a+b;prompt=`${a}p + ${b}p`;
+ hint=`Add the pennies. Try adding ${b} to ${a} in small steps.`;explain=`${a}p + ${b}p = ${answer}p. That is the total price.`;visual={kind:'parts',a,b};spoken=`A moon sticker costs ${a} pence. A rocket badge costs ${b} pence. How many pence altogether?`;
+ }else if(mode==='doubles'){
  a=tier===1&&index===0?48:rand(tier?11:2,max); b=a; answer=a+b;prompt=`${a} + ${a}`;
  const unit=tier===3?100:10, big=Math.floor(a/unit)*unit,small=a%unit;
  hint=big?`Split ${a} into ${big} and ${small}. Double each part, then put them together.`:`Make two equal groups of ${a}. Count them together.`;

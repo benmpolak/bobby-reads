@@ -1,5 +1,5 @@
 const {test}=require('node:test');const assert=require('node:assert/strict');const E=require('../engine.js');
-test('maths questions have correct answers and explanations across 24,000 samples',()=>{
+test('maths questions have correct answers and explanations across 32,000 samples',()=>{
 for(const mode of Object.keys(E.modes))for(let tier=0;tier<4;tier++)for(let i=0;i<1000;i++){
 const q=E.question(mode,tier,Math.random,i);assert.ok(Number.isInteger(q.answer)&&q.answer>=0);assert.ok(q.hint&&q.explain&&q.spoken);
 if(mode==='doubles'||mode==='add')assert.equal(q.answer,q.a+q.b);
@@ -23,5 +23,11 @@ test('times-table rounds cover every selectable table without division or repeat
 test('subtraction always stays within ten and removes only one to three',()=>{
  for(let tier=0;tier<4;tier++)for(let i=0;i<500;i++){
   const q=E.question('subtract',tier);assert.ok(q.a<=10&&q.a>=2);assert.ok(q.b>=1&&q.b<=3&&q.b<=q.a);assert.equal(q.answer,q.a-q.b);assert.equal(q.visual.kind,'takeaway');
+ }
+});
+test('number bonds and money questions preserve totals and units at every level',()=>{
+ for(let tier=0;tier<4;tier++)for(let i=0;i<1000;i++){
+  const b=E.question('bonds',tier);assert.equal(b.a+b.answer,[10,20,100,100][tier]);assert.equal(b.visual.b,null);assert.ok(b.answer>0);
+  const m=E.question('money',tier);assert.equal(m.answer,m.a+m.b);assert.match(m.prompt,/^\d+p \+ \d+p$/);assert.match(m.explain,new RegExp('= '+m.answer+'p'));assert.ok(m.answer<=198);
  }
 });

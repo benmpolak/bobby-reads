@@ -1,7 +1,7 @@
 const {JSDOM}=require('jsdom');const fs=require('fs');const assert=require('node:assert/strict');
 const vm=require('node:vm');
 const root=require('node:path').join(__dirname,'../');
-function boot(storage={},blocked=false){const dom=new JSDOM('<div id="app"></div>',{url:'https://benmpolak.github.io/bobby-reads/',runScripts:'outside-only'});const w=dom.window;w.scrollTo=()=>{};w.matchMedia=()=>({matches:true});for(const [k,v]of Object.entries(storage))w.localStorage.setItem(k,v);if(blocked)Object.defineProperty(w,'localStorage',{get(){throw new Error('blocked')}});w.eval=code=>vm.runInContext(code,dom.getInternalVMContext());for(const file of ['legacy.js','engine.js','adventure.js'])w.eval(fs.readFileSync(root+file,'utf8'));return w;}
+function boot(storage={},blocked=false){const dom=new JSDOM('<div id="app"></div>',{url:'https://benmpolak.github.io/bobby-reads/',runScripts:'outside-only'});const w=dom.window;w.scrollTo=()=>{};w.matchMedia=()=>({matches:true});for(const [k,v]of Object.entries(storage))w.localStorage.setItem(k,v);if(blocked)Object.defineProperty(w,'localStorage',{get(){throw new Error('blocked')}});w.eval=code=>vm.runInContext(code,dom.getInternalVMContext());for(const file of ['legacy.js','engine.js','maths-quests.js','adventure.js'])w.eval(fs.readFileSync(root+file,'utf8'));return w;}
 function click(w,text){const b=[...w.document.querySelectorAll('button')].find(b=>b.textContent===text||b.textContent.includes(text));assert.ok(b,`button ${text}`);b.click();}
 let w=boot({bobbyStars:'27',bobbyRead:'["kickit"]',bobbyLevel:'reception'});assert.match(w.document.body.textContent,/27/);assert.equal(w.eval('level'),'reception');assert.equal(w.eval('readBooks[0]'),'kickit');
 click(w,'Let’s solve it');assert.equal(w.eval('run.q.answer'),96);
@@ -46,3 +46,26 @@ w.eval('showParents()');const difficulty=w.document.querySelector('#difficulty')
 for(const fn of ['showBlend','showTricky','showSounds','showAlien','showHome','showMaths','showReading','showCrew','showStories'])w.eval(fn+'()');
 const saved={};for(let i=0;i<w.localStorage.length;i++){const k=w.localStorage.key(i);saved[k]=w.localStorage.getItem(k);}const restored=boot(saved);assert.equal(restored.eval('progress.missions'),8);assert.equal(restored.eval('stars'),w.eval('stars'));
 for(const state of [{bobbyRead:'not json',bobbyStars:'oops',bobbyAdventure:'not json'},{bobbyRead:'{}',bobbyAdventure:'null'}]){const bad=boot(state);assert.match(bad.document.body.textContent,/Let’s go/);bad.close();}const blocked=boot({},true);blocked.eval('startMath("add")');assert.ok(blocked.document.querySelector('input'));blocked.close();w.close();restored.close();console.log('Integration passed: ten-question addition and times tables, easy subtraction and counter limits, red/green answer marking, migration, five-question missions, duplicate rewards, hints, words, all story routes, books, settings, reload and unavailable storage/audio.');
+// New mission lifecycle: wrong answers persist, assisted facts stay queued, independent recalls clear them.
+const game=boot({bobbyStars:'42',bobbyAdventure:JSON.stringify({mathSolved:30,missions:7})});
+function submit(g,value){g.document.querySelector('input').value=String(value);g.document.querySelector('form').dispatchEvent(new g.Event('submit',{cancelable:true}));}
+game.eval('startMath("groups",undefined,7)');const missed=game.eval('run.q');
+submit(game,999);submit(game,998);assert.match(game.document.querySelector('.help-area').textContent,new RegExp('The right answer: '+missed.prompt.replace(/[+*?]/g,'\\$&')));
+assert.equal(game.eval('progress.practice.length'),1);assert.equal(game.eval('stars'),42);
+submit(game,missed.answer);assert.equal(game.eval('tableScore(7)'),0);click(game,'Next puzzle');assert.ok(game.document.querySelector('.step.helped'));assert.equal(game.document.querySelector('.step.helped').textContent,'↻');
+for(let i=1;i<10;i++){submit(game,game.eval('run.q.answer'));click(game,i===9?'Finish mission':'Next puzzle');}
+assert.equal(game.document.querySelectorAll('.round-review li').length,10);assert.match(game.document.querySelector('.earlier-guesses').textContent,/999, 998/);assert.equal(game.eval('progress.mathGame.rounds'),1);assert.equal(game.eval('progress.mathGame.comebacks'),1);assert.equal(game.eval('tableScore(7)'),9);assert.ok(game.eval('mathBadges().find(b=>b.name==="Good comeback").won'));
+const savedGame=game.localStorage.getItem('bobbyAdventure'),recall=boot({bobbyAdventure:savedGame});recall.eval('startPractice()');assert.equal(recall.eval('run.length'),1);assert.equal(recall.eval('run.q.prompt'),missed.prompt);submit(recall,missed.answer);assert.equal(recall.eval('progress.practice.length'),0);assert.equal(recall.eval('tableScore(7)'),10);click(recall,'Finish mission');assert.equal(recall.eval('progress.mathGame.rounds'),2);recall.eval('finishRun()');assert.equal(recall.eval('progress.mathGame.rounds'),2);
+// The mixed deck uses each question's mode for adaptation and labels; subtraction never gets harder.
+recall.eval('startPlanet()');assert.equal(recall.eval('run.length'),10);
+for(let i=0;i<10;i++){
+ const q=recall.eval('run.q');if(q.mode==='subtract')assert.ok(q.a<=10&&q.b<=3);
+ if(q.mode==='money')assert.match(recall.eval('answerEquation(run.q,run.q.answer)'),/p$/);
+ if(q.mode==='bonds')assert.doesNotMatch(recall.eval('answerEquation(run.q,run.q.answer)'),/\?/);
+ submit(recall,q.answer);click(recall,i===9?'Finish mission':'Next puzzle');
+}
+assert.match(recall.document.querySelector('.landing-banner').textContent,/Mint Moon/);assert.equal(recall.eval('progress.mathGame.rounds'),3);assert.ok(recall.eval('mathBadges().find(b=>b.name==="Perfect ten").won'));
+recall.eval('showDiscoveries()');assert.equal(recall.document.querySelectorAll('.planet-reward.earned').length,1);recall.eval('showTables()');assert.equal(recall.document.querySelectorAll('.passport').length,12);assert.equal(recall.document.querySelectorAll('.fact-lights .lit').length,recall.eval('Object.keys(progress.tableFacts).length'));
+// Hint use, reveal, and repeated submissions cannot count as independent or award twice.
+recall.eval('startMath("bonds")');click(recall,'Help me think');submit(recall,recall.eval('run.q.answer'));assert.equal(recall.eval('run.independent'),0);assert.equal(recall.eval('run.helped'),1);const count=recall.eval('stars');submit(recall,recall.eval('run.q.answer'));assert.equal(recall.eval('stars'),count);assert.ok(recall.eval('progress.practice.length>0'));
+recall.close();game.close();console.log('Quest checks passed: saved retries, amber history, exact review, passport facts, mixed modes, planets, badges, migration and reward guards.');
