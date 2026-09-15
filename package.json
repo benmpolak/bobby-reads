@@ -1,8 +1,8 @@
 {
-  "name": "bobby-big-adventure",
-  "version": "2.0.0",
+  "name": "bobby-reads",
+  "version": "3.0.0",
   "private": true,
-  "description": "A static reading and maths adventure for Bobby",
+  "description": "Direct maths and word tests for Bobby",
   "scripts": {
     "test": "node --test tests/engine.test.cjs && node tests/integration.cjs",
     "start": "python3 -m http.server 8137 --bind 127.0.0.1"

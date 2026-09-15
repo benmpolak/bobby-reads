@@ -1,40 +1,49 @@
-# Bobby’s Big Adventure
+# Bobby Reads
 
-The next version of Bobby Reads. A static family reading and maths app hosted on the existing GitHub Pages site.
+Direct maths and word tests, hosted at https://benmpolak.github.io/bobby-reads/.
 
-## Play
+## Practice
 
-- Eight maths games: number bonds, pocket money, doubles, addition, gentle subtraction, missing numbers, sequences and dedicated times tables. Addition and times tables have ten questions per round, with a replay button; other missions have five. Choose any table from 1 to 12, mix 2s, 5s and 10s, or play a Surprise round of ten questions drawn from ten different tables. No division.
-- Four difficulty levels for addition, doubles, missing numbers and patterns. These games adapt independently after three unaided correct answers or two questions needing help. Parents can select a fixed level. Subtraction always stays within ten, removing one to three with interactive rocks, regardless of old scores or parent settings. Times tables stay on the selected table.
-- Number models, scaffolded hints, touch keypad and a make-your-own-sum lab. Answers receive green ticks or red crosses and explicit text, including the attempted equation.
-- Twenty words to build with grapheme tiles and three five-question story mysteries, each with two opening choices. Story questions cover retrieval, inference, vocabulary and reasoning. Each route changes the opening and two clue scenes before rejoining the ending.
-- Original books and phonics games retained, including existing stars and read-book history. Bookmarks added.
-- Short missions, stars and six crew unlocks. No timers, lost lives, daily streak demands, account or tracking.
+- Start mixed maths or word building directly from the home screen. No space story, missions, crew or unlock screens.
+- Maths rounds: 10, 20 or 30 questions, default 20. Mix addition and subtraction, mix in multiplication, or practise an individual skill.
+- Addition mixes mostly familiar two-digit work with easier questions and occasional stretches. Automatic addition is capped at sums up to 200. Fixed Big numbers mode goes up to 1,000.
+- Subtraction ranges from numbers within 20 to subtracting tens and hundreds from numbers up to 1,000. Regular questions cross a ten. Answers stay non-negative. Hints split the subtraction into tens and ones.
+- Each individual times table covers all 12 facts in a shuffled order. Mixed rounds have 24 questions, balanced across all 12 tables, the trickier tables, or 2, 5 and 10.
+- Other maths: doubles, missing numbers, number bonds, patterns and money.
+- Word building: 80 words, with clues, spelling tiles, two spare tiles and optional whole-word audio. A familiar-word setting uses 30 words. Sentence tests have 40 questions with three choices. Choose 10 or 20 per round. Unseen and missed words are prioritised.
+- Results show first-time answers, helped answers and previous guesses. Maths mistakes are saved for another try. Known multiplication facts fill in the table progress.
+- Every solved question earns a star. A complete round earns five more. Finish here stops whenever Bobby wants, retaining answer progress without a completion bonus. No timers or lost lives.
+- Original books, phonics cards and reading progress remain available.
 
-Stretch stories are not represented as scheme-matched decodable books. Device speech reads words and sentences; it does not assess spoken answers or supply isolated phoneme teaching. Adult guidance and primary educational references are in the grown-up area.
+## Difficulty and saves
+
+Skills adapt after five first-time answers or two helped answers. Question selection mixes familiar work, consolidation and an occasional stretch. Addition keeps its baseline at or below the starting level so it does not race into large numbers. Grown-ups can choose a fixed level.
+
+Progress is local to the browser under `bobbyAdventure`. Existing `bobbyStars`, `bobbyRead` and `bobbyLevel` keys are preserved. The version 3 migration resets only the obsolete tiny-subtraction level and softens an old automatic addition score. Book history, stars, completed rounds, practice questions and known facts remain.
+
+No accounts, analytics or cross-device sync. If browser storage is blocked, progress lasts for that visit. Audio reads whole words and sentences using the device voice; it does not assess spoken reading or teach isolated phonemes. The first visit requires internet access; no service worker is installed.
 
 ## Run and check
 
-The served app has no runtime dependencies or build step. Serve this directory with `npm start` or any static server. For the development checks use Node 22.13+ and `npm ci`, then `npm test`.
+Static files, with no build step or runtime dependencies:
 
-Tests cover arithmetic invariants across 32,000 questions, adaptation limits, legacy data migration, full missions, retries and duplicate reward protection, word tiles, every story opening, book position, settings, reload, and unavailable browser storage/audio. Browser visual/device testing is separate from these programmatic checks.
+```sh
+npm ci
+npm test
+npm start
+```
+
+Requires Node 22.13+ for the development tests. Local preview runs on port 8137.
+
+Tests cover 32,000 generated questions, harder subtraction, balanced mixed modes and tables, varied addition, word/sentence content and interactions, saved retries, early finishing, reward guards, migrations, settings, books, reload and unavailable storage/audio. Responsive browser checks are separate.
+
+GitHub Pages publishes the root of `main`.
 
 ## Files
 
-- `index.html`: entry point and retained reader styles.
-- `legacy.js`: existing books, phonics data and reader/game functions.
-- `engine.js`: pure maths generation and adaptation, also used by tests.
-- `adventure.js`, `adventure.css`: new adventure experience.
-- `assets/space-companion.png`: original generated artwork.
-
-Progress is local to the browser under `bobbyAdventure`. Existing `bobbyStars`, `bobbyRead` and `bobbyLevel` keys are preserved. There is no cross-device sync. No service worker is installed; a first visit requires internet access.
-
-GitHub Pages serves the root of `main` at https://benmpolak.github.io/bobby-reads/.
-
-## Maths expeditions
-
-Mixed ten-question planet missions, six planet landings (one every three completed maths rounds) and eight achievement badges. A visible fuel bar fills with each solved puzzle. No time limits or lost lives.
-
-Every round keeps a question-by-question log: green for independent answers, amber for assisted answers, red for previous guesses. Mistakes and helped questions enter a persistent Fix-it queue (up to 60); answering one independently clears it. Each table has a 12-fact passport, collected through independent answers. Two wrong attempts show a worked answer, with an earlier reveal button available. Existing stars and reading progress are preserved; the new expedition counters start with this update.
-
-`maths-quests.js` contains the mission and collection UI. Tests cover retries across reloads, mixed-mode adaptation, unique passport facts, planet and badge unlocks, and reward idempotency.
+- `index.html`: entry point and original reader styles.
+- `legacy.js`: original books, phonics data and reader functions.
+- `engine.js`: maths generation and progression.
+- `words.js`: word and sentence question banks.
+- `adventure.js`, `adventure.css`: practice screens.
+- `maths-quests.js`: retained filename for saved practice, table progress and results.
